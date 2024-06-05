@@ -3,16 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="module" src="main.js"></script>
+    <!--<script defer type="module" src="main.js"></script>-->
     <title>Data Structures and Algorithms</title>
     <style>
         *{
             margin:0;
             padding:0;
             box-sizing: border-box;
-            border: 1px solid black;
+            font-family : monospace;
+            font-size : 1.2rem;
+            letter-spacing: .1rem;
         }
-        #peek,#input,#button{
+        #stack{
+            display:flex;
+            flex-direction:column;
+            align-items: center;
+            min-height:100vh;
+        }
+        #peek{
+            border: #888 solid 3px;
+            border-radius: 10px;
+            width : 95%;
+            min-height: 50px;
+            margin-top:.5rem;
+        }
+        #input,#button{
             width : 100%;
             min-height : 50px;
         }
@@ -20,16 +35,9 @@
             padding : 50px;
         }
         #input-box{
-            min-width:300px;
-            width:75%;
+            width:100%;
             max-width:600px;
             font-size: 18px;
-        }
-        #add-button,#remove-button,#peek-button{
-            width : 150px;
-            height: 50px;
-            background-color:blueviolet;
-            color : white;
         }
         #buttons{
             display:flex;
@@ -45,7 +53,30 @@
             justify-content: center;
             align-items: center;
         }
-        
+        #add-button,#remove-button,#peek-button{
+            flex-basis: 100px;
+            flex-grow: 1;
+            border-radius: 10px;
+            width : 150px;
+            height: 50px;
+            background-color:blueviolet;
+            color : white;
+            transition-duration: 1s;
+        }
+        #buttons>div:hover{
+            background-color: #cba7ec;
+            color:rgb(99, 6, 185);
+        }
+        #preview{
+            flex-basis: 75px;
+            display:flex;
+            flex-direction:column-reverse;
+            justify-content: flex-end;
+            align-items: center;
+            flex-grow: 1;
+            gap:.1rem;
+            padding:.1rem;
+        }
     </style>
 </head>
 <body>
@@ -61,5 +92,107 @@
         </div>
         <div id="preview"></div>
     </div>
+    <script>
+        class Stack{
+
+            #Item = class {
+                constructor(value){
+                    this.value=value;
+                    this.top=null;
+                    this.bottom=null;
+                }
+            };
+
+            constructor(){
+                this.length=0;
+                this.top=null;
+            }
+
+            add(item){
+
+                this.length++;
+                if(!this.top) return this.top=new this.#Item(item);
+                this.top.top = new this.#Item(item);
+                this.top.top.bottom = this.top;
+                return this.top = this.top.top;
+            }
+            remove(){
+                if(!this.top) return null;
+                
+                this.length--;
+
+                if(!this.top.bottom){
+                    delete this.top;
+                    this.top=null;
+                    return null;
+                }
+
+                this.top.bottom.top=null;
+                return this.top= this.top.bottom;
+            }
+            peek(){
+                return this.top;
+            }
+            print(){
+                let current=this.top;
+                if (this.top){
+                    let current=this.top;
+                    do{
+                        console.log(current);
+                        current=current.bottom;
+                    }while(current)
+                }
+            }
+        }
+        let stack=new Stack();
+        const peekButton = document.querySelector("#peek-button");
+        const addButton = document.querySelector("#add-button");
+        const removeButton = document.querySelector("#remove-button");
+        const input = document.querySelector("#input-box");
+        const peek = document.querySelector("#peek");
+        const preview = document.querySelector("#preview");
+    
+
+        addButton.addEventListener("click",(event)=>{
+
+            if(input.value){
+                stack.add(input.value);
+                peek.textContent=input.value;
+                
+                let item = document.createElement("div");
+                item.textContent=input.value;
+                item.style.width="fit-content";
+                item.style.padding=".3rem";
+                item.style.backgroundColor="#cba7ec";
+                item.style.borderRadius="7000px";
+                item.style.color="#222";
+                input.value="";
+
+                preview.appendChild(item);
+                stack.print();
+            } 
+            else{
+                peek.textContent="No value provided";
+            }
+
+        });
+        peekButton.addEventListener("click",(event)=>{
+            if(stack.peek())peek.textContent=stack.peek().value;
+            else{peek.textContent="Empty Stack";}
+        });
+        removeButton.addEventListener("click",(event)=>{
+            if(stack.peek()){
+                peek.textContent=stack.top.value;
+                stack.remove();
+                preview.removeChild(preview.lastChild);
+                stack.print();
+            }
+            else{
+                peek.textContent="Empty Stack";
+            }
+        });
+
+        
+    </script>
 </body>
 </html>
